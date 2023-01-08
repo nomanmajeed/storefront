@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.http import HttpRequest
 from django.db.models import Count
 from django.urls import reverse
@@ -22,6 +22,7 @@ class InventoryFilter(admin.SimpleListFilter):
 
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
+    actions = ['clear_inventory']
     list_display = ['title', 'unit_price', 'inventory_status', 'collection_title']
     list_editable = ['unit_price']
     list_select_related = ['collection'] # qs.select_related for admin
@@ -35,6 +36,11 @@ class ProductAdmin(admin.ModelAdmin):
     
     def collection_title(self, product):
         return product.collection.title
+    
+    @admin.action(description='Clear Inventory')
+    def clear_inventory(self, request, queryset):
+        updated_count = queryset.update(inventory=0)
+        self.message_user(request, f"{updated_count} products were successfully updated.", messages.SUCCESS)        
 
 
 @admin.register(models.Collection)
