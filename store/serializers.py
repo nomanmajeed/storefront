@@ -4,10 +4,13 @@ from rest_framework import serializers
 
 from store.models import Product, Collection
 
-class CollectionSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    title = serializers.CharField()
+class CollectionSerializer(serializers.ModelSerializer):
+    products_count = serializers.IntegerField()
     
+    class Meta:
+        model = Collection
+        fields = ['id', 'title', 'products_count']
+            
 class ProductSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     title = serializers.CharField()
