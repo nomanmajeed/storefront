@@ -8,7 +8,7 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework import status
 from store.filters import ProductFilter
 from store.pagination import DefaultPagination
-from store.models import Cart, CartItem, Collection, Product, Review
+from store.models import Cart, CartItem, Collection, Product, Review, OrderItem
 from store.serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, CollectionSerializer, ProductSerializer, ReviewSerializer, UpdateCartItemSerializer
 
 
@@ -37,7 +37,7 @@ class CollectionViewSet(ModelViewSet):
     serializer_class = CollectionSerializer
 
     def destroy(self, request, *args, **kwargs):
-        collection = get_object_or_404(Collection, pk=pk)
+        collection = get_object_or_404(Collection, pk=kwargs['pk'])
         if collection.products.count() > 0:
             return Response({'error': 'Collection cannot be deleted because it includes one or more products.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
         return super().destroy(request, *args, **kwargs)
