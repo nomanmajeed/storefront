@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework import status
 
 from store.models import *
@@ -65,6 +66,40 @@ def product_detail(request, id):
         serializer = ProductMSerializer(product, data=request.data)
         return Response(serializer.data)
     elif request.user == 'DELETE':
+        if product.otheritem_set.count > 0:
+            return Response({
+                'error':'Cannot delete a product because it is associated with a product item.'
+            }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        product.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class ProductList(APIView):
+    
+    def get(self, request):
+        products = Product.objects.select_related('collection').all()
+        serializer = ProductMSerializer(products, many=True, context={'request': request})
+        return Response(serializer.data)
+    
+    def post(self, request):
+        serializer = ProductMSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class ProductDetail(APIView):
+    
+    def get(self, request, id):
+        product = get_object_or_404(Product, pk=id)
+        serializer = ProductMSerializer(product, context={'request': request})
+        return Response(serializer.data)
+    
+    def put(self, request, id):
+        product = get_object_or_404(Product, pk=id)
+        serializer = ProductMSerializer(product, data=request.data)
+        return Response(serializer.data)
+    
+    def delete(self, request, id):
+        product = get_object_or_404(Product, pk=id)
         if product.otheritem_set.count > 0:
             return Response({
                 'error':'Cannot delete a product because it is associated with a product item.'
