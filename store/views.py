@@ -8,8 +8,8 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework import status
 from store.filters import ProductFilter
 from store.pagination import DefaultPagination
-from store.models import Cart, CartItem, Collection, Product, Review, OrderItem
-from store.serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, CollectionSerializer, ProductSerializer, ReviewSerializer, UpdateCartItemSerializer
+from store.models import Cart, CartItem, Collection, Product, Review, OrderItem, Customer
+from store.serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, CollectionSerializer, ProductSerializer, ReviewSerializer, UpdateCartItemSerializer, CustomerSerializer
 
 
 
@@ -78,3 +78,8 @@ class CartItemViewSet(ModelViewSet):
         return CartItem.objects \
                 .filter(cart_id=self.kwargs['cart_pk']) \
                 .select_related('product')
+
+
+class CustomerViewSet(ModelViewSet):
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer
