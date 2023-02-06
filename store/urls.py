@@ -1,7 +1,7 @@
 from django.urls import path
 from django.urls.conf import include
 from rest_framework_nested import routers
-from . import views, email_view
+from . import test_views, views
 
 router = routers.DefaultRouter()
 router.register('products', views.ProductViewSet, basename='products')
@@ -21,5 +21,6 @@ carts_router.register('items', views.CartItemViewSet, basename='cart-items')
 urlpatterns = router.urls + products_router.urls + carts_router.urls
 
 urlpatterns += [
-    path('test_mail/', email_view.draft_mail)
+    path('test_mail/', test_views.draft_mail),
+    path('test_celery/', test_views.test_celery),
 ]
